@@ -11,6 +11,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -67,6 +68,7 @@ public final class FullResultDialog {
         VBox.setVgrow(resultArea, Priority.ALWAYS);
 
         Scene scene = new Scene(root, 680, 460);
+        scene.setFill(Color.web("#050505"));
         URL cssUrl = FullResultDialog.class.getResource("/com/boyang/calculator/css/apple-dark.css");
         if (cssUrl != null) {
             scene.getStylesheets().add(cssUrl.toExternalForm());

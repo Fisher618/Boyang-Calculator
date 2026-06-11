@@ -3,7 +3,7 @@ package com.boyang.calculator.controller;
 import com.boyang.calculator.engine.BasicCalculatorEngine;
 import com.boyang.calculator.model.CalculatorMode;
 import com.boyang.calculator.util.BigNumberUtil;
-import com.boyang.calculator.util.FullResultDialog;
+import com.boyang.calculator.util.ResultInteractionUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -37,8 +37,9 @@ public class BasicController {
      */
     @FXML
     private void initialize() {
-        displayLabel.setTooltip(new Tooltip("点击查看完整结果"));
-        displayLabel.setOnMouseClicked(event -> FullResultDialog.show(fullExpression, fullResult));
+        displayLabel.setTooltip(new Tooltip("点击复制结果，长结果点击查看"));
+        displayLabel.setOnMouseClicked(event ->
+                ResultInteractionUtil.handleResultClick(displayLabel, fullExpression, fullResult));
         clearAll();
     }
 

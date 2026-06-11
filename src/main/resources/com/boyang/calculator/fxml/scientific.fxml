@@ -5,28 +5,46 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.boyang.calculator.controller.ScientificController"
-      alignment="CENTER"
+      alignment="TOP_CENTER"
       spacing="18.0"
       styleClass="calculator-view">
-    <VBox alignment="CENTER_RIGHT" minHeight="110.0" styleClass="display-area">
+    <VBox alignment="CENTER_RIGHT" minHeight="90.0" maxWidth="Infinity" styleClass="display-area">
         <padding>
             <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
         </padding>
-        <Label fx:id="expressionLabel" text="Scientific mode" styleClass="expression-label"/>
-        <Label fx:id="displayLabel" text="0" styleClass="display-label"/>
+        <Label fx:id="expressionLabel" text="Scientific mode" maxWidth="Infinity" alignment="CENTER_RIGHT" styleClass="expression-label"/>
+        <Label fx:id="displayLabel" text="0" maxWidth="Infinity" alignment="CENTER_RIGHT" styleClass="display-label"/>
     </VBox>
-    <GridPane hgap="10.0" vgap="10.0" maxWidth="560.0">
+    <Region minHeight="0.0" VBox.vgrow="SOMETIMES"/>
+    <GridPane hgap="8.0"
+              vgap="8.0"
+              maxWidth="Infinity"
+              maxHeight="650.0"
+              styleClass="calculator-grid,extended-grid"
+              VBox.vgrow="ALWAYS">
         <columnConstraints>
             <ColumnConstraints percentWidth="25.0"/>
             <ColumnConstraints percentWidth="25.0"/>
             <ColumnConstraints percentWidth="25.0"/>
             <ColumnConstraints percentWidth="25.0"/>
         </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="0.0" vgrow="ALWAYS"/>
+            <RowConstraints minHeight="0.0" vgrow="ALWAYS"/>
+            <RowConstraints minHeight="0.0" vgrow="ALWAYS"/>
+            <RowConstraints minHeight="0.0" vgrow="ALWAYS"/>
+            <RowConstraints minHeight="0.0" vgrow="ALWAYS"/>
+            <RowConstraints minHeight="0.0" vgrow="ALWAYS"/>
+            <RowConstraints minHeight="0.0" vgrow="ALWAYS"/>
+            <RowConstraints minHeight="0.0" vgrow="ALWAYS"/>
+        </rowConstraints>
 
         <Button text="(" onAction="#handleScientificAction" styleClass="calc-button,function-button" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
         <Button text=")" onAction="#handleScientificAction" styleClass="calc-button,function-button" GridPane.rowIndex="0" GridPane.columnIndex="1"/>

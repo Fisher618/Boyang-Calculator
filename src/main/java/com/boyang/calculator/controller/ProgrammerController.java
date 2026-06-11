@@ -3,7 +3,7 @@ package com.boyang.calculator.controller;
 import com.boyang.calculator.engine.ProgrammerCalculatorEngine;
 import com.boyang.calculator.model.NumberBase;
 import com.boyang.calculator.util.BigNumberUtil;
-import com.boyang.calculator.util.FullResultDialog;
+import com.boyang.calculator.util.ResultInteractionUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -16,6 +16,9 @@ import javafx.scene.control.Tooltip;
 public class ProgrammerController {
 
     private static final int DISPLAY_MAX_LENGTH = 48;
+
+    @FXML
+    private Label expressionLabel;
 
     @FXML
     private Label hexValue;
@@ -48,6 +51,7 @@ public class ProgrammerController {
         setupResultLabel(decValue, NumberBase.DEC);
         setupResultLabel(octValue, NumberBase.OCT);
         setupResultLabel(binValue, NumberBase.BIN);
+        updateExpression("");
         updateBaseValues();
     }
 
@@ -74,10 +78,18 @@ public class ProgrammerController {
     }
 
     private void switchBase(NumberBase newBase) {
+        if (newBase == activeBase) {
+            return;
+        }
+        boolean wasWaitingForNextNumber = waitingForNextNumber;
+        if (pendingOperator != null) {
+            leftOperand = engine.convert(leftOperand, activeBase, newBase);
+        }
         currentInput = engine.convert(currentInput, activeBase, newBase);
         activeBase = newBase;
         fullResult = currentInput;
-        waitingForNextNumber = false;
+        waitingForNextNumber = wasWaitingForNextNumber;
+        updateCurrentExpression();
         updateBaseValues();
     }
 
@@ -92,6 +104,7 @@ public class ProgrammerController {
             currentInput += digit;
         }
         fullResult = currentInput;
+        updateCurrentExpression();
         updateBaseValues();
     }
 
@@ -104,6 +117,7 @@ public class ProgrammerController {
         waitingForNextNumber = true;
         fullExpression = leftOperand + " " + operator;
         fullResult = currentInput;
+        updateExpression(fullExpression);
         updateBaseValues();
     }
 
@@ -117,6 +131,7 @@ public class ProgrammerController {
         fullResult = currentInput;
         pendingOperator = null;
         waitingForNextNumber = true;
+        updateExpression(fullExpression);
         updateBaseValues();
     }
 
@@ -125,6 +140,7 @@ public class ProgrammerController {
         currentInput = engine.not(currentInput, activeBase);
         fullResult = currentInput;
         waitingForNextNumber = true;
+        updateExpression(fullExpression);
         updateBaseValues();
     }
 
@@ -135,6 +151,7 @@ public class ProgrammerController {
         fullExpression = "";
         fullResult = "0";
         waitingForNextNumber = false;
+        updateExpression("");
         updateBaseValues();
     }
 
@@ -148,7 +165,23 @@ public class ProgrammerController {
             currentInput = currentInput.substring(0, currentInput.length() - 1);
         }
         fullResult = currentInput;
+        updateCurrentExpression();
         updateBaseValues();
+    }
+
+    private void updateCurrentExpression() {
+        if (pendingOperator == null) {
+            fullExpression = currentInput;
+        } else if (waitingForNextNumber) {
+            fullExpression = leftOperand + " " + pendingOperator;
+        } else {
+            fullExpression = leftOperand + " " + pendingOperator + " " + currentInput;
+        }
+        updateExpression(fullExpression);
+    }
+
+    private void updateExpression(String expression) {
+        expressionLabel.setText(BigNumberUtil.toDisplayText(expression, DISPLAY_MAX_LENGTH));
     }
 
     private void updateBaseValues() {
@@ -170,10 +203,10 @@ public class ProgrammerController {
     }
 
     private void setupResultLabel(Label label, NumberBase base) {
-        label.setTooltip(new Tooltip("点击查看完整结果"));
+        label.setTooltip(new Tooltip("点击复制结果，长结果点击查看"));
         label.setOnMouseClicked(event -> {
             String result = isError(fullResult) ? fullResult : engine.convert(currentInput, activeBase, base);
-            FullResultDialog.show(fullExpression, result);
+            ResultInteractionUtil.handleResultClick(label, fullExpression, result);
         });
     }
 

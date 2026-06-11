@@ -30,8 +30,8 @@ public class MainApp extends Application {
         }
 
         stage.setTitle("Apple Style Calculator");
-        stage.setMinWidth(900);
-        stage.setMinHeight(600);
+        stage.setMinWidth(820);
+        stage.setMinHeight(720);
         stage.setScene(scene);
         stage.show();
     }

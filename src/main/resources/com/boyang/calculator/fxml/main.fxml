@@ -5,37 +5,91 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.boyang.calculator.controller.MainController"
-            prefWidth="1100.0"
-            prefHeight="700.0"
-            styleClass="root">
-    <left>
-        <VBox fx:id="historyPanel" prefWidth="280.0" spacing="16.0" styleClass="history-panel">
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.boyang.calculator.controller.MainController"
+           fx:id="mainRoot"
+           prefWidth="1100.0"
+           prefHeight="700.0"
+           styleClass="root">
+    <BorderPane>
+        <left>
+            <VBox fx:id="historyPanel"
+                  prefWidth="280.0"
+                  spacing="16.0"
+                  visible="false"
+                  managed="false"
+                  styleClass="history-panel">
+                <padding>
+                    <Insets top="22.0" right="18.0" bottom="22.0" left="18.0"/>
+                </padding>
+                <Label text="History" styleClass="panel-title"/>
+                <VBox fx:id="historyContent" VBox.vgrow="ALWAYS"/>
+            </VBox>
+        </left>
+        <center>
+            <VBox minWidth="0.0" spacing="16.0" styleClass="main-area">
+                <padding>
+                    <Insets top="22.0" right="28.0" bottom="28.0" left="28.0"/>
+                </padding>
+                <HBox alignment="CENTER_LEFT" minWidth="0.0" spacing="10.0" styleClass="top-bar">
+                    <Button text="☰"
+                            onAction="#toggleModeDrawer"
+                            styleClass="menu-button"/>
+                    <Label fx:id="modeTitle"
+                           text="Basic Calculator"
+                           minWidth="0.0"
+                           textOverrun="ELLIPSIS"
+                           styleClass="mode-title"
+                           HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="historyButton"
+                            text="History"
+                            onAction="#toggleHistoryPanel"
+                            styleClass="mode-button"/>
+                </HBox>
+                <StackPane fx:id="calculatorContent" minWidth="0.0" minHeight="0.0" VBox.vgrow="ALWAYS"/>
+            </VBox>
+        </center>
+    </BorderPane>
+
+    <StackPane fx:id="modeDrawerOverlay"
+               visible="false"
+               managed="false"
+               styleClass="mode-drawer-overlay">
+        <Pane onMouseClicked="#closeModeDrawer" styleClass="drawer-scrim"/>
+        <VBox fx:id="modeDrawer"
+              prefWidth="300.0"
+              maxWidth="300.0"
+              spacing="8.0"
+              styleClass="mode-drawer"
+              StackPane.alignment="CENTER_LEFT">
             <padding>
-                <Insets top="22.0" right="18.0" bottom="22.0" left="18.0"/>
+                <Insets top="22.0" right="14.0" bottom="22.0" left="14.0"/>
             </padding>
-            <Label text="History" styleClass="panel-title"/>
-            <VBox fx:id="historyContent" VBox.vgrow="ALWAYS"/>
-        </VBox>
-    </left>
-    <center>
-        <VBox spacing="20.0" styleClass="main-area">
-            <padding>
-                <Insets top="22.0" right="28.0" bottom="28.0" left="28.0"/>
-            </padding>
-            <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="top-bar">
-                <Label fx:id="modeTitle" text="Basic Calculator" styleClass="mode-title" HBox.hgrow="ALWAYS"/>
-                <Button text="Basic" onAction="#switchToBasic" styleClass="mode-button"/>
-                <Button text="Scientific" onAction="#switchToScientific" styleClass="mode-button"/>
-                <Button text="Programmer" onAction="#switchToProgrammer" styleClass="mode-button"/>
-                <Button text="History" onAction="#toggleHistoryPanel" styleClass="mode-button"/>
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="drawer-header">
+                <Button text="☰" onAction="#toggleModeDrawer" styleClass="menu-button"/>
+                <Label text="Calculator" styleClass="panel-title"/>
             </HBox>
-            <StackPane fx:id="calculatorContent" VBox.vgrow="ALWAYS"/>
+            <Label text="Calculator modes" styleClass="drawer-section-title"/>
+            <Button fx:id="basicModeButton"
+                    text="Basic"
+                    onAction="#switchToBasic"
+                    maxWidth="Infinity"
+                    styleClass="drawer-mode-button"/>
+            <Button fx:id="scientificModeButton"
+                    text="Scientific"
+                    onAction="#switchToScientific"
+                    maxWidth="Infinity"
+                    styleClass="drawer-mode-button"/>
+            <Button fx:id="programmerModeButton"
+                    text="Programmer"
+                    onAction="#switchToProgrammer"
+                    maxWidth="Infinity"
+                    styleClass="drawer-mode-button"/>
         </VBox>
-    </center>
-</BorderPane>
+    </StackPane>
+</StackPane>

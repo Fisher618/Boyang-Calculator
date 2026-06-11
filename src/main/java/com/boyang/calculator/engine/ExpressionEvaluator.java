@@ -3,74 +3,26 @@ package com.boyang.calculator.engine;
 import com.boyang.calculator.util.BigNumberUtil;
 
 import java.math.BigDecimal;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
- * BigDecimal 表达式求值器，支持四则、取余、括号和整数指数。
+ * BigDecimal expression evaluator supporting arithmetic, parentheses and
+ * scientific functions.
  */
 public class ExpressionEvaluator {
 
-    /**
-     * 计算表达式并返回完整十进制字符串。
-     */
     public String evaluate(String expression) {
         if (expression == null || expression.isBlank()) {
             return "0";
         }
 
         try {
-            Deque<BigDecimal> values = new ArrayDeque<>();
-            Deque<Character> operators = new ArrayDeque<>();
-            String normalized = expression.replace("×", "*").replace("÷", "/");
-
-            for (int i = 0; i < normalized.length(); i++) {
-                char ch = normalized.charAt(i);
-                if (Character.isWhitespace(ch)) {
-                    continue;
-                }
-
-                if (isNumberStart(normalized, i)) {
-                    int start = i;
-                    i++;
-                    while (i < normalized.length() && isNumberPart(normalized.charAt(i))) {
-                        i++;
-                    }
-                    values.push(new BigDecimal(normalized.substring(start, i)));
-                    i--;
-                } else if (ch == '(') {
-                    operators.push(ch);
-                } else if (ch == ')') {
-                    while (!operators.isEmpty() && operators.peek() != '(') {
-                        applyTopOperator(values, operators.pop());
-                    }
-                    if (operators.isEmpty() || operators.pop() != '(') {
-                        return "Error: invalid expression";
-                    }
-                } else if (isOperator(ch)) {
-                    while (!operators.isEmpty()
-                            && operators.peek() != '('
-                            && shouldApplyBefore(operators.peek(), ch)) {
-                        applyTopOperator(values, operators.pop());
-                    }
-                    operators.push(ch);
-                } else {
-                    return "Error: invalid expression";
-                }
+            Parser parser = new Parser(expression.replace("×", "*").replace("÷", "/"));
+            BigDecimal result = parser.parseExpression();
+            parser.skipWhitespace();
+            if (!parser.isAtEnd()) {
+                throw new IllegalArgumentException("Unexpected input.");
             }
-
-            while (!operators.isEmpty()) {
-                char operator = operators.pop();
-                if (operator == '(') {
-                    return "Error: invalid expression";
-                }
-                applyTopOperator(values, operator);
-            }
-
-            if (values.size() != 1) {
-                return "Error: invalid expression";
-            }
-            return BigNumberUtil.formatDecimal(values.pop());
+            return BigNumberUtil.formatDecimal(result);
         } catch (ArithmeticException exception) {
             return "Error: division by zero";
         } catch (RuntimeException exception) {
@@ -78,78 +30,163 @@ public class ExpressionEvaluator {
         }
     }
 
-    private boolean isNumberStart(String expression, int index) {
-        char ch = expression.charAt(index);
-        if (Character.isDigit(ch) || ch == '.') {
-            return true;
+    private static final class Parser {
+        private final String expression;
+        private int position;
+
+        private Parser(String expression) {
+            this.expression = expression;
         }
-        if (ch != '-') {
+
+        private BigDecimal parseExpression() {
+            BigDecimal value = parseTerm();
+            while (true) {
+                if (match('+')) {
+                    value = value.add(parseTerm());
+                } else if (match('-')) {
+                    value = value.subtract(parseTerm());
+                } else {
+                    return value;
+                }
+            }
+        }
+
+        private BigDecimal parseTerm() {
+            BigDecimal value = parseUnary();
+            while (true) {
+                if (match('*')) {
+                    value = value.multiply(parseUnary());
+                } else if (match('/')) {
+                    value = BigNumberUtil.safeDivide(value, parseUnary());
+                } else if (match('%')) {
+                    value = value.remainder(parseUnary());
+                } else {
+                    return value;
+                }
+            }
+        }
+
+        private BigDecimal parseUnary() {
+            if (match('+')) {
+                return parseUnary();
+            }
+            if (match('-')) {
+                return parseUnary().negate();
+            }
+            return parsePower();
+        }
+
+        private BigDecimal parsePower() {
+            BigDecimal base = parsePrimary();
+            if (match('^')) {
+                return pow(base, parseUnary());
+            }
+            return base;
+        }
+
+        private BigDecimal parsePrimary() {
+            skipWhitespace();
+            if (match('(')) {
+                BigDecimal value = parseExpression();
+                require(')');
+                return value;
+            }
+            if (position < expression.length() && Character.isLetter(expression.charAt(position))) {
+                String functionName = parseIdentifier();
+                require('(');
+                BigDecimal argument = parseExpression();
+                require(')');
+                return applyFunction(functionName, argument);
+            }
+            return parseNumber();
+        }
+
+        private BigDecimal parseNumber() {
+            skipWhitespace();
+            int start = position;
+            boolean decimalSeen = false;
+            while (position < expression.length()) {
+                char ch = expression.charAt(position);
+                if (Character.isDigit(ch)) {
+                    position++;
+                } else if (ch == '.' && !decimalSeen) {
+                    decimalSeen = true;
+                    position++;
+                } else {
+                    break;
+                }
+            }
+            if (start == position) {
+                throw new IllegalArgumentException("Number expected.");
+            }
+            return new BigDecimal(expression.substring(start, position));
+        }
+
+        private String parseIdentifier() {
+            int start = position;
+            while (position < expression.length() && Character.isLetter(expression.charAt(position))) {
+                position++;
+            }
+            return expression.substring(start, position);
+        }
+
+        private BigDecimal applyFunction(String name, BigDecimal argument) {
+            if ("sqrt".equals(name)) {
+                if (argument.signum() < 0) {
+                    throw new IllegalArgumentException("Negative square root.");
+                }
+                return argument.sqrt(BigNumberUtil.MC);
+            }
+
+            double number = argument.doubleValue();
+            double result = switch (name) {
+                case "sin" -> Math.sin(number);
+                case "cos" -> Math.cos(number);
+                case "tan" -> Math.tan(number);
+                case "ln" -> Math.log(number);
+                case "log" -> Math.log10(number);
+                default -> throw new IllegalArgumentException("Unsupported function.");
+            };
+            if (!Double.isFinite(result)) {
+                throw new IllegalArgumentException("Function result is not finite.");
+            }
+            return BigDecimal.valueOf(result);
+        }
+
+        private BigDecimal pow(BigDecimal base, BigDecimal exponent) {
+            if (!BigNumberUtil.isInteger(exponent)) {
+                throw new IllegalArgumentException("Exponent must be an integer.");
+            }
+            int power = exponent.intValueExact();
+            if (power < 0) {
+                return BigNumberUtil.safeDivide(BigDecimal.ONE, base.pow(Math.abs(power), BigNumberUtil.MC));
+            }
+            return base.pow(power, BigNumberUtil.MC);
+        }
+
+        private boolean match(char expected) {
+            skipWhitespace();
+            if (position < expression.length() && expression.charAt(position) == expected) {
+                position++;
+                return true;
+            }
             return false;
         }
-        if (index + 1 >= expression.length()) {
-            return false;
-        }
-        char next = expression.charAt(index + 1);
-        if (!Character.isDigit(next) && next != '.') {
-            return false;
-        }
-        int previous = index - 1;
-        while (previous >= 0 && Character.isWhitespace(expression.charAt(previous))) {
-            previous--;
-        }
-        return previous < 0 || expression.charAt(previous) == '(' || isOperator(expression.charAt(previous));
-    }
 
-    private boolean isNumberPart(char ch) {
-        return Character.isDigit(ch) || ch == '.';
-    }
-
-    private boolean isOperator(char ch) {
-        return ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '%' || ch == '^';
-    }
-
-    private boolean shouldApplyBefore(char existing, char incoming) {
-        if (incoming == '^') {
-            return precedence(existing) > precedence(incoming);
+        private void require(char expected) {
+            if (!match(expected)) {
+                throw new IllegalArgumentException("Missing " + expected);
+            }
         }
-        return precedence(existing) >= precedence(incoming);
-    }
 
-    private int precedence(char operator) {
-        return switch (operator) {
-            case '+', '-' -> 1;
-            case '*', '/', '%' -> 2;
-            case '^' -> 3;
-            default -> 0;
-        };
-    }
+        private void skipWhitespace() {
+            while (position < expression.length() && Character.isWhitespace(expression.charAt(position))) {
+                position++;
+            }
+        }
 
-    private void applyTopOperator(Deque<BigDecimal> values, char operator) {
-        if (values.size() < 2) {
-            throw new IllegalArgumentException("Missing operand.");
+        private boolean isAtEnd() {
+            return position >= expression.length();
         }
-        BigDecimal right = values.pop();
-        BigDecimal left = values.pop();
-        BigDecimal result = switch (operator) {
-            case '+' -> left.add(right);
-            case '-' -> left.subtract(right);
-            case '*' -> left.multiply(right);
-            case '/' -> BigNumberUtil.safeDivide(left, right);
-            case '%' -> left.remainder(right);
-            case '^' -> pow(left, right);
-            default -> throw new IllegalArgumentException("Unsupported operator.");
-        };
-        values.push(result);
-    }
-
-    private BigDecimal pow(BigDecimal base, BigDecimal exponent) {
-        if (!BigNumberUtil.isInteger(exponent)) {
-            throw new IllegalArgumentException("Exponent must be an integer.");
-        }
-        int power = exponent.intValueExact();
-        if (power < 0) {
-            return BigNumberUtil.safeDivide(BigDecimal.ONE, base.pow(Math.abs(power), BigNumberUtil.MC));
-        }
-        return base.pow(power);
     }
 }

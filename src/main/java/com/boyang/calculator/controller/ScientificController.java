@@ -2,7 +2,7 @@ package com.boyang.calculator.controller;
 
 import com.boyang.calculator.engine.ScientificCalculatorEngine;
 import com.boyang.calculator.util.BigNumberUtil;
-import com.boyang.calculator.util.FullResultDialog;
+import com.boyang.calculator.util.ResultInteractionUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -27,14 +27,16 @@ public class ScientificController {
     private String currentExpression = "";
     private String fullExpression = "";
     private String fullResult = "0";
+    private boolean justEvaluated;
 
     /**
      * 初始化科学计算器显示。
      */
     @FXML
     private void initialize() {
-        displayLabel.setTooltip(new Tooltip("点击查看完整结果"));
-        displayLabel.setOnMouseClicked(event -> FullResultDialog.show(fullExpression, fullResult));
+        displayLabel.setTooltip(new Tooltip("点击复制结果，长结果点击查看"));
+        displayLabel.setOnMouseClicked(event ->
+                ResultInteractionUtil.handleResultClick(displayLabel, fullExpression, fullResult));
         updateExpression("");
         updateResult("0");
     }
@@ -51,10 +53,10 @@ public class ScientificController {
             case "=" -> evaluate();
             case "×" -> appendOperator("*");
             case "÷" -> appendOperator("/");
-            case "x²" -> applySquare();
-            case "sqrt" -> applySqrt();
+            case "x²" -> appendSquare();
+            case "sqrt" -> appendFunction("sqrt");
             case "xʸ" -> appendOperator("^");
-            case "sin", "cos", "tan", "ln", "log" -> applyApproximateFunction(text);
+            case "sin", "cos", "tan", "ln", "log" -> appendFunction(text);
             case "π" -> appendToken("3.14159265358979323846264338327950288419716939937510");
             case "e" -> appendToken("2.71828182845904523536028747135266249775724709369995");
             case "Deg/Rad" -> expressionLabel.setText("Deg/Rad reserved");
@@ -63,13 +65,12 @@ public class ScientificController {
     }
 
     private void appendToken(String token) {
-        if (isError(fullResult) || "0".equals(fullResult) && currentExpression.isBlank()) {
+        if (justEvaluated || isError(fullResult)) {
             currentExpression = "";
+            justEvaluated = false;
         }
         currentExpression += token;
-        fullExpression = currentExpression;
-        updateExpression(currentExpression);
-        updateResult(currentExpression);
+        updateInputDisplay();
     }
 
     private void appendOperator(String operator) {
@@ -77,9 +78,26 @@ public class ScientificController {
             currentExpression = fullResult;
         }
         currentExpression += " " + operator + " ";
-        fullExpression = currentExpression;
-        updateExpression(currentExpression);
-        updateResult(currentExpression);
+        justEvaluated = false;
+        updateInputDisplay();
+    }
+
+    private void appendFunction(String functionName) {
+        if (justEvaluated || isError(fullResult)) {
+            currentExpression = "";
+            justEvaluated = false;
+        }
+        currentExpression += functionName + "(";
+        updateInputDisplay();
+    }
+
+    private void appendSquare() {
+        if (currentExpression.isBlank()) {
+            currentExpression = fullResult;
+        }
+        currentExpression += "^2";
+        justEvaluated = false;
+        updateInputDisplay();
     }
 
     private void evaluate() {
@@ -92,53 +110,14 @@ public class ScientificController {
         updateResult(result);
         if (!isError(result)) {
             currentExpression = result;
-        }
-    }
-
-    private void applySquare() {
-        String value = currentExpression.isBlank() ? fullResult : engine.evaluateExpression(currentExpression);
-        String result = safeUnaryResult(() -> engine.square(value));
-        fullExpression = "(" + value + ")²";
-        updateExpression(fullExpression);
-        updateResult(result);
-        if (!isError(result)) {
-            currentExpression = result;
-        }
-    }
-
-    private void applySqrt() {
-        String value = currentExpression.isBlank() ? fullResult : engine.evaluateExpression(currentExpression);
-        String result = safeUnaryResult(() -> engine.sqrt(value));
-        fullExpression = "sqrt(" + value + ")";
-        updateExpression(fullExpression);
-        updateResult(result);
-        if (!isError(result)) {
-            currentExpression = result;
-        }
-    }
-
-    private void applyApproximateFunction(String functionName) {
-        String value = currentExpression.isBlank() ? fullResult : engine.evaluateExpression(currentExpression);
-        String result = safeUnaryResult(() -> engine.approximateFunction(functionName, value));
-        fullExpression = functionName + "(" + value + ")";
-        updateExpression(fullExpression);
-        updateResult(result);
-        if (!isError(result)) {
-            currentExpression = result;
-        }
-    }
-
-    private String safeUnaryResult(ResultSupplier supplier) {
-        try {
-            return supplier.get();
-        } catch (RuntimeException exception) {
-            return "Error: invalid expression";
+            justEvaluated = true;
         }
     }
 
     private void clearAll() {
         currentExpression = "";
         fullExpression = "";
+        justEvaluated = false;
         updateExpression("");
         updateResult("0");
     }
@@ -146,10 +125,18 @@ public class ScientificController {
     private void deleteLast() {
         if (!currentExpression.isBlank()) {
             currentExpression = currentExpression.substring(0, currentExpression.length() - 1);
-            fullExpression = currentExpression;
-            updateExpression(currentExpression);
-            updateResult(currentExpression.isBlank() ? "0" : currentExpression);
+            justEvaluated = false;
+            updateInputDisplay();
         }
+    }
+
+    private void updateInputDisplay() {
+        fullExpression = currentExpression;
+        updateExpression(currentExpression);
+        displayLabel.setText(BigNumberUtil.toDisplayText(
+                currentExpression.isBlank() ? "0" : currentExpression,
+                DISPLAY_MAX_LENGTH
+        ));
     }
 
     private void updateExpression(String expression) {
@@ -165,8 +152,4 @@ public class ScientificController {
         return value != null && value.startsWith("Error");
     }
 
-    @FunctionalInterface
-    private interface ResultSupplier {
-        String get();
-    }
 }

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.boyang.calculator.controller.ProgrammerController"
+      alignment="CENTER"
+      spacing="18.0"
+      styleClass="calculator-view">
+    <VBox spacing="8.0" minHeight="130.0" styleClass="display-area">
+        <padding>
+            <Insets top="10.0" right="14.0" bottom="10.0" left="14.0"/>
+        </padding>
+        <HBox spacing="16.0"><Label text="HEX" styleClass="base-label"/><Label fx:id="hexValue" text="0" styleClass="base-value"/></HBox>
+        <HBox spacing="16.0"><Label text="DEC" styleClass="base-label"/><Label fx:id="decValue" text="0" styleClass="base-value"/></HBox>
+        <HBox spacing="16.0"><Label text="OCT" styleClass="base-label"/><Label fx:id="octValue" text="0" styleClass="base-value"/></HBox>
+        <HBox spacing="16.0"><Label text="BIN" styleClass="base-label"/><Label fx:id="binValue" text="0" styleClass="base-value"/></HBox>
+    </VBox>
+    <GridPane hgap="10.0" vgap="10.0" maxWidth="560.0">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="25.0"/>
+            <ColumnConstraints percentWidth="25.0"/>
+            <ColumnConstraints percentWidth="25.0"/>
+            <ColumnConstraints percentWidth="25.0"/>
+        </columnConstraints>
+
+        <Button text="HEX" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Button text="DEC" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <Button text="OCT" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+        <Button text="BIN" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+        <Button text="AND" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <Button text="OR" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <Button text="XOR" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+        <Button text="NOT" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+        <Button text="&lt;&lt;" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <Button text="&gt;&gt;" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <Button text="AC" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+        <Button text="DEL" onAction="#handleProgrammerAction" styleClass="calc-button,function-button" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+        <Button text="A" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <Button text="B" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <Button text="C" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+        <Button text="D" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+        <Button text="E" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <Button text="F" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        <Button text="7" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="4" GridPane.columnIndex="2"/>
+        <Button text="8" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="4" GridPane.columnIndex="3"/>
+        <Button text="9" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <Button text="4" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+        <Button text="5" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="5" GridPane.columnIndex="2"/>
+        <Button text="6" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="5" GridPane.columnIndex="3"/>
+        <Button text="1" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <Button text="2" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+        <Button text="3" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="6" GridPane.columnIndex="2"/>
+        <Button text="+" onAction="#handleProgrammerAction" styleClass="calc-button,operator-button" GridPane.rowIndex="6" GridPane.columnIndex="3"/>
+        <Button text="0" onAction="#handleProgrammerAction" styleClass="calc-button,number-button" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+        <Button text="=" onAction="#handleProgrammerAction" styleClass="calc-button,operator-button" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+        <Button text="-" onAction="#handleProgrammerAction" styleClass="calc-button,operator-button" GridPane.rowIndex="7" GridPane.columnIndex="2"/>
+        <Button text="×" onAction="#handleProgrammerAction" styleClass="calc-button,operator-button" GridPane.rowIndex="7" GridPane.columnIndex="3"/>
+    </GridPane>
+</VBox>

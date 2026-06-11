@@ -1,0 +1,194 @@
+.root {
+    -fx-background-color: #050505;
+    -fx-font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+.main-area {
+    -fx-background-color: #050505;
+}
+
+.top-bar {
+    -fx-min-height: 44px;
+}
+
+.mode-title,
+.panel-title {
+    -fx-text-fill: #f5f5f7;
+    -fx-font-size: 22px;
+    -fx-font-weight: 700;
+}
+
+.calculator-view {
+    -fx-background-color: #050505;
+}
+
+.display-area {
+    -fx-background-color: #111111;
+    -fx-background-radius: 18px;
+    -fx-min-width: 460px;
+}
+
+.display-label {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 56px;
+    -fx-font-weight: 300;
+}
+
+.expression-label {
+    -fx-text-fill: #8e8e93;
+    -fx-font-size: 18px;
+}
+
+.calc-button {
+    -fx-min-width: 88px;
+    -fx-min-height: 58px;
+    -fx-background-radius: 29px;
+    -fx-border-width: 0;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 20px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+}
+
+.number-button {
+    -fx-background-color: #333333;
+}
+
+.function-button {
+    -fx-background-color: #a5a5a5;
+    -fx-text-fill: #111111;
+}
+
+.operator-button {
+    -fx-background-color: #ff9f0a;
+    -fx-text-fill: #ffffff;
+}
+
+.mode-button {
+    -fx-background-color: #1f1f1f;
+    -fx-background-radius: 18px;
+    -fx-border-width: 0;
+    -fx-text-fill: #f5f5f7;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 8px 14px;
+    -fx-cursor: hand;
+}
+
+.calc-button:hover,
+.mode-button:hover {
+    -fx-opacity: 0.82;
+}
+
+.calc-button:pressed,
+.mode-button:pressed {
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+}
+
+.history-panel {
+    -fx-background-color: #101010;
+    -fx-border-color: #222222;
+    -fx-border-width: 0 1px 0 0;
+}
+
+.history-list {
+    -fx-background-color: transparent;
+}
+
+.history-item {
+    -fx-background-color: #1c1c1e;
+    -fx-background-radius: 12px;
+    -fx-padding: 10px;
+}
+
+.history-panel .label {
+    -fx-text-fill: #d1d1d6;
+}
+
+.base-label {
+    -fx-text-fill: #8e8e93;
+    -fx-font-size: 16px;
+    -fx-font-weight: 700;
+    -fx-min-width: 46px;
+}
+
+.base-value {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 18px;
+}
+
+.full-result-dialog {
+    -fx-background-color: #050505;
+    -fx-background-radius: 20px;
+    -fx-border-color: #242424;
+    -fx-border-radius: 20px;
+    -fx-border-width: 1px;
+}
+
+.dialog-section-title {
+    -fx-text-fill: #f5f5f7;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+}
+
+.full-result-text-area {
+    -fx-background-color: #111111;
+    -fx-background-radius: 14px;
+    -fx-border-color: #2c2c2e;
+    -fx-border-radius: 14px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #f5f5f7;
+    -fx-font-size: 14px;
+    -fx-font-family: "Consolas", "Cascadia Mono", "Microsoft YaHei UI", monospace;
+    -fx-highlight-fill: #ff9f0a;
+    -fx-highlight-text-fill: #050505;
+}
+
+.full-result-text-area .content {
+    -fx-background-color: #111111;
+    -fx-background-radius: 14px;
+}
+
+.full-result-text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.full-result-text-area .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.full-result-text-area .scroll-bar:horizontal,
+.full-result-text-area .scroll-bar:vertical {
+    -fx-background-color: #111111;
+}
+
+.full-result-text-area .scroll-bar .thumb {
+    -fx-background-color: #3a3a3c;
+    -fx-background-radius: 8px;
+}
+
+.dialog-button {
+    -fx-background-color: #1f1f1f;
+    -fx-background-radius: 18px;
+    -fx-border-width: 0;
+    -fx-text-fill: #f5f5f7;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-padding: 9px 16px;
+    -fx-cursor: hand;
+}
+
+.dialog-primary-button {
+    -fx-background-color: #ff9f0a;
+    -fx-text-fill: #ffffff;
+}
+
+.dialog-button:hover {
+    -fx-opacity: 0.84;
+}
+
+.dialog-button:pressed {
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+}

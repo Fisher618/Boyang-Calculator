@@ -1,60 +1,76 @@
 # AppleStyleCalculator
 
-## 项目简介
+一个使用 JavaFX 构建的多模式桌面计算器，支持基础计算、科学表达式计算和程序员整数运算。项目使用暗色界面，并参考 Windows 11 计算器实现响应式布局、模式侧栏和宽屏历史记录区域。
 
-AppleStyleCalculator 是一个 Java 课程作业项目，目标是实现一个参考 Apple Calculator 暗色圆角界面风格的多模式桌面计算器。当前版本重点完成项目骨架、基础界面、模式切换和基础计算器的最小可运行功能。
+## 功能概览
+
+### 基础计算器
+
+- 支持加、减、乘、除和取余
+- 支持小数、百分数、正负号切换和删除输入
+- 使用 `BigDecimal` 处理超大整数和高精度小数
+- 除法结果最多保留 80 位小数
+
+### 科学计算器
+
+- 支持完整表达式输入，按 `=` 后统一计算
+- 支持四则运算、括号、取余和整数幂
+- 支持 `sqrt`、`sin`、`cos`、`tan`、`ln` 和 `log`
+- 支持函数嵌套，例如：
+
+```text
+8 * sqrt(3)
+sqrt(1 + 8)
+2^3^2
+```
+
+平方根和普通表达式优先使用 `BigDecimal`。三角函数及对数函数当前使用 Java `Math` 进行近似计算。
+
+### 程序员计算器
+
+- 支持 BIN、OCT、DEC、HEX 进制切换
+- 使用 `BigInteger` 支持任意长度整数
+- 支持 AND、OR、XOR、NOT、左移和右移
+- 支持整数加、减、乘运算
+- 显示当前完整运算表达式
+
+## 界面与交互
+
+- 使用左侧滑出菜单切换基础、科学和程序员模式
+- 模式切换后，顶部仅显示当前模式名称
+- 窗口宽度达到 `1350px` 时自动显示历史记录侧栏
+- 缩小窗口后自动隐藏历史记录侧栏，并恢复 History 按钮
+- 窗口最小尺寸为 `820 x 720`，防止科学和程序员模式按键被裁切
+- 普通结果点击后直接复制，并显示“计算结果已复制到剪切板”
+- 结果过长并显示省略号时，点击结果区域打开完整结果窗口
+- 完整结果窗口支持查看和复制表达式与计算结果
+
+> 历史记录区域目前仅提供响应式界面和空状态，记录保存功能尚未实现。
 
 ## 技术栈
 
 - Java 17+
-- JavaFX
+- JavaFX 21
 - Maven
 - FXML
 - CSS
+- JUnit 5
 
-## 项目结构
+## 环境要求
 
-```text
-src/main/java/com/boyang/calculator
-├── MainApp.java
-├── controller
-│   ├── MainController.java
-│   ├── BasicController.java
-│   ├── ScientificController.java
-│   ├── ProgrammerController.java
-│   └── HistoryController.java
-├── engine
-│   ├── BasicCalculatorEngine.java
-│   ├── ScientificCalculatorEngine.java
-│   ├── ProgrammerCalculatorEngine.java
-│   └── ExpressionEvaluator.java
-├── model
-│   ├── CalculatorMode.java
-│   ├── AngleMode.java
-│   ├── NumberBase.java
-│   ├── CalculationRecord.java
-│   └── CalculatorState.java
-├── service
-│   └── HistoryService.java
-└── util
-    ├── AnimationUtil.java
-    ├── BigNumberUtil.java
-    ├── FullResultDialog.java
-    ├── FormatUtil.java
-    └── ValidationUtil.java
+运行项目前需要安装：
 
-src/main/resources/com/boyang/calculator
-├── fxml
-│   ├── main.fxml
-│   ├── basic.fxml
-│   ├── scientific.fxml
-│   ├── programmer.fxml
-│   └── history.fxml
-└── css
-    └── apple-dark.css
+- JDK 17 或更高版本
+- Maven 3.9 或兼容版本
+
+检查环境：
+
+```bash
+java -version
+mvn -version
 ```
 
-## 运行方式
+## 运行项目
 
 在项目根目录执行：
 
@@ -62,56 +78,53 @@ src/main/resources/com/boyang/calculator
 mvn javafx:run
 ```
 
-## 当前已完成功能
+注意，正确命令是 `mvn javafx:run`，不是 `mvn run:java`。
 
-- Maven JavaFX 项目骨架
-- `main.fxml` 主界面加载
-- `apple-dark.css` 暗色圆角样式
-- 基础、科学、程序员三种模式页面切换
-- 左侧历史记录面板显示与隐藏
-- 基础计算器数字输入、AC、DEL、正负号、百分号、小数点
-- 基础计算器使用 BigDecimal 支持超大数加、减、乘、除、百分号和正负号
-- 科学计算器支持 BigDecimal 表达式四则运算、括号、整数指数、平方和开方
-- 程序员计算器使用 BigInteger 支持超大整数进制转换和位运算
-- 主显示区过长时显示省略号，点击显示区域可查看和复制完整结果
+## 构建与测试
 
-## 超大数运算支持说明
+执行完整编译和测试：
 
-1. 基础计算器使用 BigDecimal 作为主要计算类型，支持超大整数和高精度小数，输入数字通过字符串构造 BigDecimal。
-2. 程序员计算器使用 BigInteger 作为主要计算类型，支持超大整数的 BIN、OCT、DEC、HEX 进制转换，以及 AND、OR、XOR、NOT、左移、右移等位运算。
-3. 主显示区结果过长时会显示省略号，但真实结果会完整保存在控制器中；点击显示区域可以打开“完整计算结果”窗口查看和复制完整结果。
-4. 科学函数中的三角函数和对数函数暂时使用 Math 库近似计算，超大数高精度主要支持四则运算、幂运算、开方和程序员整数运算。
-5. 当前版本暂时不实现历史记录持久化和平滑切换动画。
+```bash
+mvn clean test
+```
 
-## 手动测试记录
+当前自动化测试主要覆盖科学表达式求值，包括：
 
-基础计算器：
+- `8 * sqrt(3)`
+- 嵌套表达式和平方根
+- 幂运算右结合
+- 不完整表达式错误处理
 
-- `999999999999999999999999999999 + 1`：期望 `1000000000000000000000000000000`
-- `123456789123456789123456789 * 987654321987654321987654321`：期望完整整数结果，不溢出，不显示 `Infinity`，不使用科学计数法
-- `1 / 3`：期望约 80 位高精度小数，不崩溃
-- `1000000000000000000000000000000 - 1`：期望 `999999999999999999999999999999`
+## 项目结构
 
-程序员计算器：
+```text
+src
+├── main
+│   ├── java/com/boyang/calculator
+│   │   ├── controller    # JavaFX 页面控制器
+│   │   ├── engine        # 三种计算模式的运算引擎
+│   │   ├── model         # 模式、进制和记录模型
+│   │   ├── service       # 历史记录服务预留实现
+│   │   ├── util          # 大数、动画、结果交互等工具
+│   │   └── MainApp.java  # 应用入口
+│   └── resources/com/boyang/calculator
+│       ├── css            # 全局界面样式
+│       └── fxml           # 主界面和各模式页面
+└── test
+    └── java               # JUnit 自动化测试
+```
 
-- DEC 输入 `340282366920938463463374607431768211455`，切换 HEX：期望 `FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF`
-- HEX 输入 `FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF`，切换 DEC：期望 `340282366920938463463374607431768211455`
-- DEC 输入 `1 << 100`：期望 `1267650600228229401496703205376`
+## 数值处理说明
 
-完整结果查看：
+- 基础计算器使用 `BigDecimal`，不会将大整数转换为浮点数。
+- 科学表达式中的普通运算、整数幂和平方根使用高精度计算。
+- 程序员计算器使用 `BigInteger`，不限制传统的 32 位或 64 位字长。
+- 界面中显示的省略号仅用于缩略显示，后续计算始终使用完整结果。
 
-- 输入特别长的计算结果后，主显示区可以显示省略号
-- 点击显示区后弹窗显示完整数字
-- “复制结果”按钮复制完整结果
-- 下一次计算继续使用完整结果，不使用带省略号的缩略文本
+## 后续计划
 
-## 预留接口和后续计划
-
-- 科学计算器三角函数和对数函数目前是 Math 近似计算，后续可替换为高精度实现
-- 历史记录当前为内存服务，持久化保存后续实现
-- 表达式解析器后续可继续扩展函数、常量和更完整的错误提示
-- 模式切换动画目前为简单淡入淡出，后续可继续优化
-
-## 运行前注意
-
-本机需要安装 JDK 17 或更高版本，并安装 Maven 或将 Maven 加入 PATH。当前项目不使用数据库，也未引入复杂第三方库。
+- 实现历史记录保存、清空和结果复用
+- 完成 Deg/Rad 角度模式切换
+- 扩展科学函数和错误提示
+- 增加基础与程序员计算引擎的自动化测试
+- 继续优化宽屏和全屏布局
